@@ -83,20 +83,25 @@ const fetchStocks = async (req, res) => {
     res.send(" Started Fetching stocks in every 5 seconds");
 }
 
-const getStockDetails = async (req, res) => {
-  const stocks = await StockSchema.find(); // Fetch all records
-  let stockDetails = [];
-  stocks.forEach(stock => {
-      let timestamps = stock.timestamp && stock.timestamp.data ? stock.timestamp.data.slice(0, 20) : []; // Keep only top 20 entries
-      stockDetails.push({
-          name: stock.name,
-          symbol: stock.symbol,
-          rank: stock.rank,
-          timestamp: timestamps // Use the modified timestamps array
-      });
-  });
-  res.send(stockDetails);
-}
+  // get last 20 records of each stock timestamp  
+  const getStockDetails = async (req, res) => {
+    const stocks = await StockSchema.find(); // Fetch all records
+    // reverse the array to get the latest records first
+    const reversedStocks = stocks.map(stock => {
+        stock.timestamp.data = stock.timestamp.data.reverse().slice(0, 20);
+        return stock;
+    });
+    // code to get the last 20 records of each stock timestamp
+    const response = reversedStocks.map(stock => {
+        return {
+            name: stock.name,
+            symbol: stock.symbol,
+            rank: stock.rank,
+            timestamp: stock.timestamp.data.slice(0, 20)
+        }
+    })
+    res.send(response);
+};
 
 
 module.exports = {fetchAndStoreStocks,fetchStocks,getStockDetails};
