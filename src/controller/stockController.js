@@ -84,18 +84,18 @@ const fetchStocks = async (req, res) => {
 }
 
 const getStockDetails = async (req, res) => {
-    //20 records of each stock timestamp
-    const stocks = await StockSchema.find().sort({timestamp: -1}).limit(20);
-    let stockDetails = [];
-    stocks.forEach(stock => {
-        stockDetails.push({
-            name: stock.name,
-            symbol: stock.symbol,
-            rank: stock.rank,
-            timestamp: stock.timestamp
-        });
-    });
-    res.send(stockDetails);
+  const stocks = await StockSchema.find(); // Fetch all records
+  let stockDetails = [];
+  stocks.forEach(stock => {
+      let timestamps = stock.timestamp && stock.timestamp.data ? stock.timestamp.data.slice(0, 20) : []; // Keep only top 20 entries
+      stockDetails.push({
+          name: stock.name,
+          symbol: stock.symbol,
+          rank: stock.rank,
+          timestamp: timestamps // Use the modified timestamps array
+      });
+  });
+  res.send(stockDetails);
 }
 
 
