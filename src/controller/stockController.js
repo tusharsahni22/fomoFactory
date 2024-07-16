@@ -84,16 +84,15 @@ const fetchStocks = async (req, res) => {
 }
 
 const getStockDetails = async (req, res) => {
-    
     //20 records of each stock timestamp
-    const stocks = await StockSchema.find();
+    const stocks = await StockSchema.find().sort({timestamp: -1}).limit(20);
     let stockDetails = [];
     stocks.forEach(stock => {
         stockDetails.push({
             name: stock.name,
             symbol: stock.symbol,
             rank: stock.rank,
-            timestamp: stock.timestamp.data.slice(-20)
+            timestamp: stock.timestamp
         });
     });
     res.send(stockDetails);
